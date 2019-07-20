@@ -1,6 +1,6 @@
 # puppetwash
 
-A Wash plugin for puppet
+A Wash plugin for Puppet Enterprise
 
 ## Installation and configuration
 
