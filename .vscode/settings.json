@@ -1,0 +1,5 @@
+{
+  "solargraph.diagnostics": true,
+  "solargraph.formatting": true,
+  "solargraph.useBundler": true
+}
