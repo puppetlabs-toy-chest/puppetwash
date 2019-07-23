@@ -1,6 +1,6 @@
 # puppetwash
 
-A Wash plugin for Puppet Enterprise
+A [Wash](https://puppetlabs.github.io/wash/) plugin for Puppet Enterprise
 
 ## Installation and configuration
 
@@ -13,7 +13,7 @@ A Wash plugin for Puppet Enterprise
         - script: '/path/to/puppetwash/puppet'
     ```
 
-4. Configure one of more puppet infrastructures in `~/.puppetwash,yaml` - see `puppetwash.example.yaml`:
+4. Configure one of more Puppet infrastructures in `~/.puppetwash,yaml` - see `puppetwash.example.yaml`:
 
     ```yaml
     my_pe_instance:
