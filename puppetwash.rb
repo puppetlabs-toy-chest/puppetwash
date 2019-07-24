@@ -112,29 +112,25 @@ class FactsDir < Wash::Entry
       "facts { certname = \"#{@node_name}\" }",
     )
     response.data.map do |fact|
-      Fact.new(fact['name'], @node_name, @pe_name, make_readable(fact['value']).length)
+      Fact.new(fact['name'], fact['value'], @node_name, @pe_name)
     end
   end
 end
 
 class Fact < Wash::Entry
   label 'fact'
-  attributes :size
   state :node_name, :pe_name
 
-  def initialize(name, node_name, pe_name, size)
+  def initialize(name, value, node_name, pe_name)
     @name = name
+    @value = value
     @node_name = node_name
     @pe_name = pe_name
-    @size = size
+    prefetch :read
   end
 
   def read
-    response = client(@pe_name).request(
-      "",
-      "facts { name = \"#{@name}\" and certname = \"#{@node_name}\" }",
-    )
-    make_readable(response.data.first['value'])
+    make_readable(@value)
   end
 
 end
