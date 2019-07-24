@@ -4,12 +4,6 @@ require 'wash'
 require 'puppetdb'
 require 'json'
 require 'yaml'
-# require 'thor'
-
-# OpenSSL::debug = true
-
-# logger = Logger.new(STDOUT)
-# logger.level = Logger::DEBUG
 
 def config
   YAML.load_file("#{ENV['HOME']}/.puppetwash.yaml")
@@ -146,5 +140,5 @@ class Fact < Wash::Entry
 end
 
 Wash.enable_entry_schemas
-# Wash.pretty_print
+Wash.pretty_print
 Wash.run(Puppetwash, ARGV)
