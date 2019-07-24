@@ -12,7 +12,7 @@
       "args": [
         "list",
         "/puppet/my_pe_instance/nodes",
-        "{\"type\":\"nodes\",\"name\":\"nodes\",\"pe\":\"my_pe_instance\"}"
+        "{\"pe_name\":\"my_pe_instance\",\"klass\":\"NodesDir\",\"name\":\"nodes\"}"
       ],
       "cwd": "${workspaceRoot}",
       "useBundler": true
@@ -31,14 +31,14 @@
       "useBundler": true
     },
     {
-      "name": "puppetwash fact ec2_metadata",
+      "name": "puppetwash fact virtual",
       "type": "Ruby",
       "request": "launch",
       "program": "${workspaceRoot}/puppetwash.rb",
       "args": [
         "read",
-        "/puppet/my_pe_instance/nodes/dbt-mocknix0.classroom.puppet.com/fact/ec2_metadata",
-        "{\"type\":\"fact\",\"node\":\"dbt-mocknix0.classroom.puppet.com\",\"pe\":\"my_pe_instance\",\"name\":\"ec2_metadata\"}"
+        "/puppet/my_pe_instance/nodes/dbt-mocknix0.classroom.puppet.com/fact/virtual",
+        "{\"klass\":\"Fact\",\"node_name\":\"dbt-mocknix0.classroom.puppet.com\",\"pe_name\":\"my_pe_instance\",\"name\":\"virtual\"}"
       ],
       "cwd": "${workspaceRoot}",
       "useBundler": true
