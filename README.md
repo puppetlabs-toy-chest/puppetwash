@@ -27,11 +27,11 @@ A [Wash](https://puppetlabs.github.io/wash/) plugin for Puppet Enterprise
 
 ## Note 1
 
-The `cacert` key in the config should point to a Puppet ca certificate file you get from the puppetmaster's ` /etc/puppetlabs/puppet/ssl/certs/ca.pem on the master`
+The `cacert` key in the config should point to a Puppet CA certificate file you can get from ` /etc/puppetlabs/puppet/ssl/certs/ca.pem on the master`
 
 ## Note 2
 
 The hostname in `puppetdb_url` should match the master certname, otherwize you will get TLS errors. If you use a master with a non-resolvable certname, you can add an entry to your hosts file:
 ```bash
-<my_master_ip> pupetmaster.example.com
+<my_master_ip> puppetmaster.example.com
 ```
