@@ -66,7 +66,6 @@ class NodesDir < Wash::Entry
   def initialize(name, pe_name)
     @name = name
     @pe_name = pe_name
-    # puts "pe name: #{pe_name}"
   end
 
   def list
