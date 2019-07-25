@@ -21,11 +21,11 @@ def client(pe_name)
   client
 end
 
-def make_readable(fact_value)
-  if fact_value.kind_of? String
-    fact_value
+def make_readable(value)
+  if value.kind_of? String
+    value
   else
-    JSON.pretty_generate(fact_value)
+    JSON.pretty_generate(value)
   end
 end
 
