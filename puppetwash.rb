@@ -59,6 +59,7 @@ end
 
 class NodesDir < Wash::Entry
   label 'nodes_dir'
+  is_singleton
   parent_of 'Node'
   state :pe_name
 
@@ -97,6 +98,7 @@ end
 
 class FactsDir < Wash::Entry
   label 'facts_dir'
+  is_singleton
   parent_of 'Fact'
   state :node_name, :pe_name
 
