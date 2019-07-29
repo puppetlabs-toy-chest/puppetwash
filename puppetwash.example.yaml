@@ -1,4 +1,4 @@
 my_pe_instance:
   puppetdb_url: https://pupetmaster.example.com:8081
   rbac_token: <my_rbac_token>
-  cacert: /path/to/cacert.pem
+  cacert: /path/to/cacert.pem # from /etc/puppetlabs/puppet/ssl/certs/ca.pem on the master
