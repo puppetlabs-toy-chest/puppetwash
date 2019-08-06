@@ -88,9 +88,28 @@ class Node < Wash::Entry
   end
 
   def list
-    [FactsDir.new('facts', @name, @pe_name)]
+    [
+      Catalog.new('catalog.json', @name, @pe_name),
+      FactsDir.new('facts', @name, @pe_name)
+    ]
+  end
+end
+
+class Catalog < Wash::Entry
+  label 'catalog'
+  is_singleton
+  state :node_name, :pe_name
+
+  def initialize(name, node_name, pe_name)
+    @name = name
+    @node_name = node_name
+    @pe_name = pe_name
   end
 
+  def read
+    response = client(@pe_name).request("catalogs/#{@node_name}", nil)
+    make_readable(response.data)
+  end
 end
 
 class FactsDir < Wash::Entry
