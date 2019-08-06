@@ -69,10 +69,7 @@ class NodesDir < Wash::Entry
   end
 
   def list
-    response = client(@pe_name).request(
-      '',
-      'nodes {}'
-    )
+    response = client(@pe_name).request('nodes', nil)
     response.data.map do |node|
       Node.new(node['certname'], @pe_name)
     end
@@ -109,8 +106,8 @@ class FactsDir < Wash::Entry
 
   def list
     response = client(@pe_name).request(
-      "",
-      "facts { certname = \"#{@node_name}\" }",
+      'facts',
+      [:'=', :certname, @node_name]
     )
     response.data.map do |fact|
       Fact.new(fact['name'], fact['value'], @node_name, @pe_name)
@@ -133,7 +130,6 @@ class Fact < Wash::Entry
   def read
     make_readable(@value)
   end
-
 end
 
 Wash.enable_entry_schemas
