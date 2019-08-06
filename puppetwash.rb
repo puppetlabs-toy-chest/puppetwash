@@ -84,6 +84,7 @@ class Node < Wash::Entry
   def initialize(name, pe_name)
     @pe_name = pe_name
     @name = name
+    prefetch :list
   end
 
   def list
