@@ -69,10 +69,7 @@ class NodesDir < Wash::Entry
   end
 
   def list
-    response = client(@pe_name).request(
-      '',
-      'nodes {}'
-    )
+    response = client(@pe_name).request('nodes', nil)
     response.data.map do |node|
       Node.new(node['certname'], @pe_name)
     end
@@ -87,12 +84,32 @@ class Node < Wash::Entry
   def initialize(name, pe_name)
     @pe_name = pe_name
     @name = name
+    prefetch :list
   end
 
   def list
-    [FactsDir.new('facts', @name, @pe_name)]
+    [
+      Catalog.new('catalog.json', @name, @pe_name),
+      FactsDir.new('facts', @name, @pe_name)
+    ]
+  end
+end
+
+class Catalog < Wash::Entry
+  label 'catalog'
+  is_singleton
+  state :node_name, :pe_name
+
+  def initialize(name, node_name, pe_name)
+    @name = name
+    @node_name = node_name
+    @pe_name = pe_name
   end
 
+  def read
+    response = client(@pe_name).request("catalogs/#{@node_name}", nil)
+    make_readable(response.data)
+  end
 end
 
 class FactsDir < Wash::Entry
@@ -109,8 +126,8 @@ class FactsDir < Wash::Entry
 
   def list
     response = client(@pe_name).request(
-      "",
-      "facts { certname = \"#{@node_name}\" }",
+      'facts',
+      [:'=', :certname, @node_name]
     )
     response.data.map do |fact|
       Fact.new(fact['name'], fact['value'], @node_name, @pe_name)
@@ -133,7 +150,6 @@ class Fact < Wash::Entry
   def read
     make_readable(@value)
   end
-
 end
 
 Wash.enable_entry_schemas
