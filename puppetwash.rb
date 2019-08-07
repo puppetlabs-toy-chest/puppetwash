@@ -219,5 +219,6 @@ class Report < Wash::Entry
 end
 
 Wash.enable_entry_schemas
+Wash.prefetch_entry_schemas
 Wash.pretty_print
 Wash.run(Puppetwash, ARGV)
