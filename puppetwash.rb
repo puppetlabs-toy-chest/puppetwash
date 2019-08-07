@@ -71,7 +71,7 @@ class NodesDir < Wash::Entry
   def list
     response = client(@pe_name).request('nodes', nil)
     response.data.map do |node|
-      Node.new(node['certname'], @pe_name)
+      Node.new(node, @pe_name)
     end
   end
 end
@@ -80,10 +80,12 @@ class Node < Wash::Entry
   label 'node'
   parent_of 'FactsDir'
   state :pe_name
+  attributes :meta
 
-  def initialize(name, pe_name)
+  def initialize(node, pe_name)
+    @name = node['certname']
     @pe_name = pe_name
-    @name = name
+    @meta = node
     prefetch :list
   end
 
