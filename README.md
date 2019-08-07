@@ -1,6 +1,8 @@
 # puppetwash
 
-A [Wash](https://puppetlabs.github.io/wash/) plugin for Puppet Enterprise
+A [Wash](https://puppetlabs.github.io/wash/) plugin for Puppet Enterprise. It will
+iterate all nodes from PuppetDB and expose information about them, such as their
+facts, last run report, and the current catalog.
 
 ## Installation and configuration
 
