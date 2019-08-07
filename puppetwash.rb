@@ -78,7 +78,7 @@ end
 
 class Node < Wash::Entry
   label 'node'
-  parent_of 'FactsDir'
+  parent_of 'Catalog', 'FactsDir', 'ReportsDir'
   state :pe_name
 
   def initialize(name, pe_name)
@@ -90,7 +90,8 @@ class Node < Wash::Entry
   def list
     [
       Catalog.new('catalog.json', @name, @pe_name),
-      FactsDir.new('facts', @name, @pe_name)
+      FactsDir.new('facts', @name, @pe_name),
+      ReportsDir.new('reports', @name, @pe_name)
     ]
   end
 end
@@ -149,6 +150,69 @@ class Fact < Wash::Entry
 
   def read
     make_readable(@value)
+  end
+end
+
+# Report relies on end_time and hash. The others are included as useful metadata.
+METADATA_FIELDS = {
+  'end_time': 'string',
+  'environment': 'string',
+  'status': 'string',
+  'noop': 'boolean',
+  'puppet_version': 'string',
+  'producer': 'string',
+  'hash': 'string'
+}
+
+class ReportsDir < Wash::Entry
+  label 'reports_dir'
+  is_singleton
+  parent_of 'Report'
+  state :node_name, :pe_name
+
+  def initialize(name, node_name, pe_name)
+    @name = name
+    @node_name = node_name
+    @pe_name = pe_name
+  end
+
+  def list
+    response = client(@pe_name).request(
+      'reports',
+      [:extract,
+        METADATA_FIELDS.keys,
+        [:'=', :certname, @node_name]]
+    )
+    response.data.map do |report|
+      Report.new(report, @node_name, @pe_name)
+    end
+  end
+end
+
+class Report < Wash::Entry
+  label 'report'
+  attributes :meta, :mtime
+  meta_attribute_schema(
+      type: 'object',
+      properties: METADATA_FIELDS.map { |k, v| [k, { type: v }] }.to_h
+  )
+  state :node_name, :pe_name, :hash
+
+  def initialize(report, node_name, pe_name)
+    @name = report['end_time']
+    @node_name = node_name
+    @pe_name = pe_name
+    @hash = report['hash']
+    @meta = report
+    @mtime = Time.parse(report['end_time'])
+  end
+
+  def read
+    response = client(@pe_name).request(
+      'reports',
+      [:and, [:'=', :certname, @node_name], [:'=', :hash, @hash]]
+    )
+    make_readable(response.data)
   end
 end
 
