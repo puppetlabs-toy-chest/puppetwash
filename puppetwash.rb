@@ -10,15 +10,25 @@ def config
 end
 
 def client(pe_name)
-  pe_config = config
-  client = PuppetDB::Client.new(
-    {
-      server: pe_config[pe_name]['puppetdb_url'],
-      token: pe_config[pe_name]['rbac_token'],
-      cacert: pe_config[pe_name]['cacert']
-    }
-  )
-  client
+  conf = config[pe_name]
+  if conf['rbac_token']
+    # PE token-based auth
+    PuppetDB::Client.new({
+      server: conf['puppetdb_url'],
+      token:  conf['rbac_token'],
+      cacert: conf['cacert']
+    })
+  else
+    # Cert-based auth
+    PuppetDB::Client.new({
+      server: conf['puppetdb_url'],
+      pem: {
+        'ca_file' => conf['cacert'],
+        'key'     => conf['key'],
+        'cert'    => conf['cert']
+      }
+    })
+  end
 end
 
 def make_readable(value)
