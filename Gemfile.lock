@@ -1,16 +1,9 @@
-GIT
-  remote: https://github.com/puppetlabs/wash-ruby
-  revision: ab5d9b8504c90152aeb46059c549d3a86ccee6da
+PATH
+  remote: .
   specs:
-    wash (0.1.0)
-
-GIT
-  remote: https://github.com/voxpupuli/puppetdb-ruby
-  revision: ce306366231f7a805a535a857f38e97288bbcea3
-  branch: master
-  specs:
-    puppetdb-ruby (1.1.1)
-      httparty
+    puppetwash (0.1.0)
+      puppetdb-ruby (~> 1.2)
+      wash (~> 0.1)
 
 GEM
   remote: https://rubygems.org/
@@ -30,22 +23,24 @@ GEM
     pry (0.12.2)
       coderay (~> 1.1.0)
       method_source (~> 0.9.0)
+    puppetdb-ruby (1.2.0)
+      httparty
     rake (12.3.3)
     rcodetools (0.8.5.0)
     ruby-debug-ide (0.7.0)
       rake (>= 0.8.1)
+    wash (0.1.1)
 
 PLATFORMS
   ruby
   x86_64-darwin-18
 
 DEPENDENCIES
-  debase
-  pry
-  puppetdb-ruby!
-  rcodetools
-  ruby-debug-ide
-  wash!
+  debase (~> 0.2)
+  pry (~> 0.12)
+  puppetwash!
+  rcodetools (~> 0.8)
+  ruby-debug-ide (~> 0.7)
 
 BUNDLED WITH
    2.0.2
