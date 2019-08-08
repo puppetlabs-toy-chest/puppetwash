@@ -1,0 +1,24 @@
+language: ruby
+cache: bundler
+env:
+  global:
+  - WASH_VERSION=0.6.1
+  - WTFC_VERSION=6aa5eef89728cc2903490a618430cc3e59216fa8
+  - PUPPERWARE_VERSION=5e9f7a6ce41b8ca421b17eaa4f19956f05a88cb5
+before_script:
+- curl -sfL https://github.com/puppetlabs/wash/releases/download/${WASH_VERSION}/wash-${WASH_VERSION}-x86_64-unknown-linux.tgz | tar -xzC ~/bin
+- git clone https://github.com/puppetlabs/pupperware
+- cd pupperware && git checkout ${PUPPERWARE_VERSION} && cd ..
+- docker-compose -f pupperware/docker-compose.yml up -d
+- curl -sfL https://raw.githubusercontent.com/puppetlabs/wtfc/${WTFC_VERSION}/wtfc.sh -o ~/bin/wtfc
+- chmod +x ~/bin/wtfc
+- CHECK_PORT=`docker-compose -f pupperware/docker-compose.yml port puppetdb 8080 | cut -d ':' -f 2`
+- PORT=`docker-compose -f pupperware/docker-compose.yml port puppetdb 8081 | cut -d ':' -f 2`
+- sudo sh -c "echo '127.0.0.1 puppet.internal puppetdb.internal' >> /etc/hosts"
+- CWD=`pwd`
+- "echo \"pupperware: { puppetdb_url: 'https://puppetdb.internal:${PORT}', cacert: ${CWD}/pupperware/volumes/puppetdb/ssl/certs/ca.pem, cert: ${CWD}/pupperware/volumes/puppetdb/ssl/certs/puppetdb.internal.pem, key: ${CWD}/pupperware/volumes/puppetdb/ssl/private_keys/puppetdb.internal.pem }\" > ~/.puppetwash.yaml"
+script:
+  # Wait for puppetdb to be available
+- wtfc --timeout=120 --interval=1 --progress "curl --fail http://localhost:${CHECK_PORT}/status/v1/simple | grep -q '^running$'"
+- sudo chmod 644 `pwd`/pupperware/volumes/puppetdb/ssl/private_keys/puppetdb.internal.pem
+- wash validate ./puppet
