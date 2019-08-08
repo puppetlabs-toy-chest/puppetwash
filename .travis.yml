@@ -20,5 +20,6 @@ before_script:
 script:
   # Wait for puppetdb to be available
 - wtfc --timeout=120 --interval=1 --progress "curl --fail http://localhost:${CHECK_PORT}/status/v1/simple | grep -q '^running$'"
+- docker-compose -f pupperware/docker-compose.yml exec puppet puppet agent -t
 - sudo chmod 644 `pwd`/pupperware/volumes/puppetdb/ssl/private_keys/puppetdb.internal.pem
 - wash validate ./puppet
