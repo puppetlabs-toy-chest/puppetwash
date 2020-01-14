@@ -2,9 +2,11 @@ language: ruby
 cache: bundler
 env:
   global:
-  - WASH_VERSION=0.6.1
+  - WASH_VERSION=0.18.0
   - WTFC_VERSION=6aa5eef89728cc2903490a618430cc3e59216fa8
-  - PUPPERWARE_VERSION=5e9f7a6ce41b8ca421b17eaa4f19956f05a88cb5
+  - PUPPERWARE_VERSION=d9d27a1f6e0b7883100d51e664a86e63d0838870
+  - PUPPETSERVER_VERSION=6.3.1
+  - PUPPETDB_VERSION=6.3.4
 before_script:
 - curl -sfL https://github.com/puppetlabs/wash/releases/download/${WASH_VERSION}/wash-${WASH_VERSION}-x86_64-unknown-linux.tgz | tar -xzC ~/bin
 - git clone https://github.com/puppetlabs/pupperware
