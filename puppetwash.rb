@@ -90,12 +90,11 @@ class Node < Wash::Entry
   label 'node'
   parent_of 'Catalog', 'FactsDir', 'ReportsDir'
   state :pe_name
-  attributes :meta
 
   def initialize(node, pe_name)
     @name = node['certname']
     @pe_name = pe_name
-    @meta = node
+    @partial_metadata = node
     prefetch :list
   end
 
@@ -203,8 +202,8 @@ end
 
 class Report < Wash::Entry
   label 'report'
-  attributes :meta, :mtime
-  meta_attribute_schema(
+  attributes :mtime
+  partial_metadata_schema(
       type: 'object',
       properties: METADATA_FIELDS.map { |k, v| [k, { type: v }] }.to_h
   )
@@ -215,7 +214,7 @@ class Report < Wash::Entry
     @node_name = node_name
     @pe_name = pe_name
     @hash = report['hash']
-    @meta = report
+    @partial_metadata = report
     @mtime = Time.parse(report['end_time'])
   end
 
