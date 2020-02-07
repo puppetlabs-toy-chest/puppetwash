@@ -37,7 +37,7 @@ end
 class Puppetwash < Wash::Entry
   label 'puppet'
   is_singleton
-  parent_of 'PEInstance'
+  parent_of 'Instance'
   state :config
 
   def init(config)
@@ -46,14 +46,14 @@ class Puppetwash < Wash::Entry
 
   def list
     @config.map do |name, instance_config|
-       PEInstance.new(name, instance_config)
+       Instance.new(name, instance_config)
     end
   end
 end
 
-class PEInstance < Wash::Entry
-  label 'pe_instance'
-  parent_of 'NodesDir'
+class Instance < Wash::Entry
+  label 'instance'
+  parent_of 'Nodes'
   state :config
 
   def initialize(name, config)
@@ -62,12 +62,12 @@ class PEInstance < Wash::Entry
   end
 
   def list
-    [NodesDir.new('nodes', @config)]
+    [Nodes.new('nodes', @config)]
   end
 end
 
-class NodesDir < Wash::Entry
-  label 'nodes_dir'
+class Nodes < Wash::Entry
+  label 'nodes'
   is_singleton
   parent_of 'Node'
   state :config
@@ -87,7 +87,7 @@ end
 
 class Node < Wash::Entry
   label 'node'
-  parent_of 'Catalog', 'FactsDir', 'ReportsDir'
+  parent_of 'Catalog', 'Facts', 'Reports'
   state :config
 
   def initialize(node, config)
@@ -100,8 +100,8 @@ class Node < Wash::Entry
   def list
     [
       Catalog.new('catalog.json', @name, @config),
-      FactsDir.new('facts', @name, @config),
-      ReportsDir.new('reports', @name, @config)
+      Facts.new('facts', @name, @config),
+      Reports.new('reports', @name, @config)
     ]
   end
 end
@@ -123,8 +123,8 @@ class Catalog < Wash::Entry
   end
 end
 
-class FactsDir < Wash::Entry
-  label 'facts_dir'
+class Facts < Wash::Entry
+  label 'facts'
   is_singleton
   parent_of 'Fact'
   state :node_name, :config
@@ -174,8 +174,8 @@ METADATA_FIELDS = {
   'hash': 'string'
 }
 
-class ReportsDir < Wash::Entry
-  label 'reports_dir'
+class Reports < Wash::Entry
+  label 'reports'
   is_singleton
   parent_of 'Report'
   state :node_name, :config
