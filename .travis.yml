@@ -17,6 +17,11 @@ before_script:
 - CHECK_PORT=`docker-compose -f pupperware/docker-compose.yml port puppetdb 8080 | cut -d ':' -f 2`
 - PORT=`docker-compose -f pupperware/docker-compose.yml port puppetdb 8081 | cut -d ':' -f 2`
 - sudo sh -c "echo '127.0.0.1 puppet.internal puppetdb.internal' >> /etc/hosts"
+script:
+  # Wait for puppetdb to be available
+- wtfc --timeout=120 --interval=1 --progress "curl --fail http://localhost:${CHECK_PORT}/status/v1/simple | grep -q '^running$'"
+- docker-compose -f pupperware/docker-compose.yml exec puppet puppet agent -t
+- sudo chmod 644 `pwd`/pupperware/volumes/puppetdb/ssl/private_keys/puppetdb.internal.pem
 - CWD=`pwd`
 - |
   cat << EOF > wash.yaml
@@ -27,12 +32,7 @@ before_script:
       puppetdb_url: "https://puppetdb.internal:${PORT}"
       cacert: "${CWD}/pupperware/volumes/puppetdb/ssl/certs/ca.pem"
       cert: "${CWD}/pupperware/volumes/puppetdb/ssl/certs/puppetdb.internal.pem"
-      key: "${CWD}/pupperware/volumes/puppetdb/ssl/private_keys/puppetdb.internal.pem }}"
+      key: "${CWD}/pupperware/volumes/puppetdb/ssl/private_keys/puppetdb.internal.pem"
   EOF
-script:
-  # Wait for puppetdb to be available
-- wtfc --timeout=120 --interval=1 --progress "curl --fail http://localhost:${CHECK_PORT}/status/v1/simple | grep -q '^running$'"
-- docker-compose -f pupperware/docker-compose.yml exec puppet puppet agent -t
-- sudo chmod 644 `pwd`/pupperware/volumes/puppetdb/ssl/private_keys/puppetdb.internal.pem
 - cat wash.yaml
 - wash validate puppet --config-file wash.yaml
