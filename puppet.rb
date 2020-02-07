@@ -69,7 +69,7 @@ class Instance < Wash::Entry
   end
 
   def list
-    [Nodes.new('nodes', @config)]
+    [Nodes.new(@config)]
   end
 end
 
@@ -79,8 +79,8 @@ class Nodes < Wash::Entry
   parent_of 'Node'
   state :config
 
-  def initialize(name, config)
-    @name = name
+  def initialize(config)
+    @name = 'nodes'
     @config = config
   end
 
@@ -94,7 +94,7 @@ end
 
 class Node < Wash::Entry
   label 'node'
-  parent_of 'Catalog', 'Facts', 'Reports'
+  parent_of 'CatalogJSON', 'Facts', 'Reports'
   state :config
   description <<~DESC
     This is a managed node. Use the `meta` command to view its metadata.
@@ -109,15 +109,15 @@ class Node < Wash::Entry
 
   def list
     [
-      Catalog.new('catalog.json', @name, @config),
-      Facts.new('facts', @name, @config),
-      Reports.new('reports', @name, @config)
+      CatalogJSON.new(@name, @config),
+      Facts.new(@name, @config),
+      Reports.new(@name, @config)
     ]
   end
 end
 
-class Catalog < Wash::Entry
-  label 'catalog'
+class CatalogJSON < Wash::Entry
+  label 'catalog.json'
   is_singleton
   state :node_name, :config
   description <<~DESC
@@ -125,8 +125,8 @@ class Catalog < Wash::Entry
     contents.
   DESC
 
-  def initialize(name, node_name, config)
-    @name = name
+  def initialize(node_name, config)
+    @name = 'catalog.json'
     @node_name = node_name
     @config = config
   end
@@ -143,8 +143,8 @@ class Facts < Wash::Entry
   parent_of 'Fact'
   state :node_name, :config
 
-  def initialize(name, node_name, config)
-    @name = name
+  def initialize(node_name, config)
+    @name = 'facts'
     @node_name = node_name
     @config = config
   end
@@ -197,8 +197,8 @@ class Reports < Wash::Entry
   parent_of 'Report'
   state :node_name, :config
 
-  def initialize(name, node_name, config)
-    @name = name
+  def initialize(node_name, config)
+    @name = 'reports'
     @node_name = node_name
     @config = config
   end
