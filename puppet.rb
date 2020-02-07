@@ -27,11 +27,11 @@ def client(config)
 end
 
 def make_readable(value)
-  if value.kind_of? String
-    value
-  else
-    JSON.pretty_generate(value)
+  valueStr = value
+  unless valueStr.kind_of? String
+    valueStr = JSON.pretty_generate(value)
   end
+  valueStr.chomp + "\n"
 end
 
 class Puppetwash < Wash::Entry
