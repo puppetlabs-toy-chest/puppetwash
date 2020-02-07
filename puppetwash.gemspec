@@ -14,7 +14,6 @@ Gem::Specification.new do |spec|
   spec.homepage      = "https://github.com/puppetlabs/puppetwash"
   spec.license       = "Apache-2.0"
   spec.files         = Dir["*.rb"]
-  spec.require_paths = ["."]
 
   spec.required_ruby_version = "~> 2.3"
 
