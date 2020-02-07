@@ -39,6 +39,10 @@ class Puppetwash < Wash::Entry
   is_singleton
   parent_of 'Instance'
   state :config
+  description <<~DESC
+    A plugin for managing your Puppet instances (both PE and open source). Try `stree puppet`
+    to see all the things that this plugin lets you interact with.
+  DESC
 
   def init(config)
     @config = config
@@ -55,6 +59,9 @@ class Instance < Wash::Entry
   label 'instance'
   parent_of 'Nodes'
   state :config
+  description <<~DESC
+    This is a Puppet instance.
+  DESC
 
   def initialize(name, config)
     @name = name
@@ -89,6 +96,9 @@ class Node < Wash::Entry
   label 'node'
   parent_of 'Catalog', 'Facts', 'Reports'
   state :config
+  description <<~DESC
+    This is a managed node. Use the `meta` command to view its metadata.
+  DESC
 
   def initialize(node, config)
     @name = node['certname']
@@ -110,6 +120,10 @@ class Catalog < Wash::Entry
   label 'catalog'
   is_singleton
   state :node_name, :config
+  description <<~DESC
+    This is the node's most recent catalog. Try using `cat` to read its
+    contents.
+  DESC
 
   def initialize(name, node_name, config)
     @name = name
@@ -149,6 +163,9 @@ end
 class Fact < Wash::Entry
   label 'fact'
   state :node_name, :config
+  description <<~DESC
+    This is a top-level fact of the given node.
+  DESC
 
   def initialize(name, value, node_name, config)
     @name = name
@@ -207,6 +224,10 @@ class Report < Wash::Entry
       properties: METADATA_FIELDS.map { |k, v| [k, { type: v }] }.to_h
   )
   state :node_name, :config, :hash
+  description <<-DESC
+    This is a node's report. Try using the 'meta' command to view its
+    metadata.
+  DESC
 
   def initialize(report, node_name, config)
     @name = report['end_time']
