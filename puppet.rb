@@ -5,27 +5,22 @@ require 'puppetdb'
 require 'json'
 require 'yaml'
 
-def config
-  YAML.load_file("#{ENV['HOME']}/.puppetwash.yaml")
-end
-
-def client(pe_name)
-  conf = config[pe_name]
-  if conf['rbac_token']
+def client(config)
+  if config[:rbac_token]
     # PE token-based auth
     PuppetDB::Client.new({
-      server: conf['puppetdb_url'],
-      token:  conf['rbac_token'],
-      cacert: conf['cacert']
+      server: config[:puppetdb_url],
+      token:  config[:rbac_token],
+      cacert: config[:cacert]
     })
   else
     # Cert-based auth
     PuppetDB::Client.new({
-      server: conf['puppetdb_url'],
+      server: config[:puppetdb_url],
       pem: {
-        'ca_file' => conf['cacert'],
-        'key'     => conf['key'],
-        'cert'    => conf['cert']
+        'ca_file' => config[:cacert],
+        'key'     => config[:key],
+        'cert'    => config[:cert]
       }
     })
   end
@@ -43,13 +38,15 @@ class Puppetwash < Wash::Entry
   label 'puppet'
   is_singleton
   parent_of 'PEInstance'
+  state :config
 
-  def init(_wash_config)
+  def init(config)
+    @config = config
   end
 
   def list
-    config.keys.map do |name|
-       PEInstance.new(name)
+    @config.map do |name, instance_config|
+       PEInstance.new(name, instance_config)
     end
   end
 end
@@ -57,13 +54,15 @@ end
 class PEInstance < Wash::Entry
   label 'pe_instance'
   parent_of 'NodesDir'
+  state :config
 
-  def initialize(name)
+  def initialize(name, config)
     @name = name
+    @config = config
   end
 
   def list
-    [NodesDir.new('nodes', name)]
+    [NodesDir.new('nodes', @config)]
   end
 end
 
@@ -71,17 +70,17 @@ class NodesDir < Wash::Entry
   label 'nodes_dir'
   is_singleton
   parent_of 'Node'
-  state :pe_name
+  state :config
 
-  def initialize(name, pe_name)
+  def initialize(name, config)
     @name = name
-    @pe_name = pe_name
+    @config = config
   end
 
   def list
-    response = client(@pe_name).request('nodes', nil)
+    response = client(@config).request('nodes', nil)
     response.data.map do |node|
-      Node.new(node, @pe_name)
+      Node.new(node, @config)
     end
   end
 end
@@ -89,20 +88,20 @@ end
 class Node < Wash::Entry
   label 'node'
   parent_of 'Catalog', 'FactsDir', 'ReportsDir'
-  state :pe_name
+  state :config
 
-  def initialize(node, pe_name)
+  def initialize(node, config)
     @name = node['certname']
-    @pe_name = pe_name
+    @config = config
     @partial_metadata = node
     prefetch :list
   end
 
   def list
     [
-      Catalog.new('catalog.json', @name, @pe_name),
-      FactsDir.new('facts', @name, @pe_name),
-      ReportsDir.new('reports', @name, @pe_name)
+      Catalog.new('catalog.json', @name, @config),
+      FactsDir.new('facts', @name, @config),
+      ReportsDir.new('reports', @name, @config)
     ]
   end
 end
@@ -110,16 +109,16 @@ end
 class Catalog < Wash::Entry
   label 'catalog'
   is_singleton
-  state :node_name, :pe_name
+  state :node_name, :config
 
-  def initialize(name, node_name, pe_name)
+  def initialize(name, node_name, config)
     @name = name
     @node_name = node_name
-    @pe_name = pe_name
+    @config = config
   end
 
   def read
-    response = client(@pe_name).request("catalogs/#{@node_name}", nil)
+    response = client(@config).request("catalogs/#{@node_name}", nil)
     make_readable(response.data)
   end
 end
@@ -128,34 +127,34 @@ class FactsDir < Wash::Entry
   label 'facts_dir'
   is_singleton
   parent_of 'Fact'
-  state :node_name, :pe_name
+  state :node_name, :config
 
-  def initialize(name, node_name, pe_name)
+  def initialize(name, node_name, config)
     @name = name
     @node_name = node_name
-    @pe_name = pe_name
+    @config = config
   end
 
   def list
-    response = client(@pe_name).request(
+    response = client(@config).request(
       'facts',
       [:'=', :certname, @node_name]
     )
     response.data.map do |fact|
-      Fact.new(fact['name'], fact['value'], @node_name, @pe_name)
+      Fact.new(fact['name'], fact['value'], @node_name, @config)
     end
   end
 end
 
 class Fact < Wash::Entry
   label 'fact'
-  state :node_name, :pe_name
+  state :node_name, :config
 
-  def initialize(name, value, node_name, pe_name)
+  def initialize(name, value, node_name, config)
     @name = name
     @value = value
     @node_name = node_name
-    @pe_name = pe_name
+    @config = config
     prefetch :read
   end
 
@@ -179,23 +178,23 @@ class ReportsDir < Wash::Entry
   label 'reports_dir'
   is_singleton
   parent_of 'Report'
-  state :node_name, :pe_name
+  state :node_name, :config
 
-  def initialize(name, node_name, pe_name)
+  def initialize(name, node_name, config)
     @name = name
     @node_name = node_name
-    @pe_name = pe_name
+    @config = config
   end
 
   def list
-    response = client(@pe_name).request(
+    response = client(@config).request(
       'reports',
       [:extract,
         METADATA_FIELDS.keys,
         [:'=', :certname, @node_name]]
     )
     response.data.map do |report|
-      Report.new(report, @node_name, @pe_name)
+      Report.new(report, @node_name, @config)
     end
   end
 end
@@ -207,19 +206,19 @@ class Report < Wash::Entry
       type: 'object',
       properties: METADATA_FIELDS.map { |k, v| [k, { type: v }] }.to_h
   )
-  state :node_name, :pe_name, :hash
+  state :node_name, :config, :hash
 
-  def initialize(report, node_name, pe_name)
+  def initialize(report, node_name, config)
     @name = report['end_time']
     @node_name = node_name
-    @pe_name = pe_name
+    @config = config
     @hash = report['hash']
     @partial_metadata = report
     @mtime = Time.parse(report['end_time'])
   end
 
   def read
-    response = client(@pe_name).request(
+    response = client(@config).request(
       'reports',
       [:and, [:'=', :certname, @node_name], [:'=', :hash, @hash]]
     )
