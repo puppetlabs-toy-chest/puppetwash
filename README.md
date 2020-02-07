@@ -32,6 +32,11 @@ wash . ❯ cat puppet/instance_one/nodes/base-graham.delivery.puppetlabs.net/cat
   "producer": "sturdy-romp.delivery.puppetlabs.net",
   "hash": "ae8bef9977cd10c85a949cb8af97f3d27739bdc9",
 ...
+wash . ❯ find puppet -k '*report' -mtime -10h # Find all reports that were created within the last 10 hours
+puppet/instance_one/nodes/base-graham.delivery.puppetlabs.net/reports/2020-02-07T18:26:31.789Z
+puppet/instance_one/nodes/choosy-cat.delivery.puppetlabs.net/reports/2020-02-07T18:26:30.917Z
+puppet/instance_one/nodes/choosy-cat.delivery.puppetlabs.net/reports/2020-02-07T18:30:05.915Z
+...
 wash . ❯ cat puppet/instance_one/nodes/base-graham.delivery.puppetlabs.net/reports/2020-02-07T18\:26\:31.789Z
 [
   {
