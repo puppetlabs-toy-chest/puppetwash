@@ -13,7 +13,7 @@ Gem::Specification.new do |spec|
   spec.description   = "A Wash plugin for examining Puppet infrastructure nodes such as PuppetDB, Puppet Server, and PE Classifier"
   spec.homepage      = "https://github.com/puppetlabs/puppetwash"
   spec.license       = "Apache-2.0"
-  spec.files         = Dir["*.rb"] + ["puppet"]
+  spec.files         = Dir["*.rb"]
   spec.require_paths = ["."]
 
   spec.required_ruby_version = "~> 2.3"
