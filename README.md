@@ -67,7 +67,7 @@ wash . ❯ cat puppet/instance_one/nodes/base-graham.delivery.puppetlabs.net/fac
       #my_pe_instance:
       #  puppetdb_url: https://puppetmaster.example.com:8081
       #  rbac_token: <my_rbac_token>
-      #  cacert: /path/to/cacert.pem # from /etc/puppetlabs/puppet/ssl/certs/ca.pem on the master
+      #  cacert: /path/to/cacert.pem # copy this from `puppet config print localcacert` on the master
       #
       # Uncomment this to add the 'my_oss_instance' open source instance
       #my_oss_instance:
@@ -80,11 +80,7 @@ wash . ❯ cat puppet/instance_one/nodes/base-graham.delivery.puppetlabs.net/fac
 
 > If you're a developer, you can use the puppetwash plugin from source with `bundle install` and set `script: /path/to/puppetwash/puppet`.
 
-## Note 1
-
-For PE instances: The `cacert` key in the config should point to a Puppet CA certificate file you can get from ` /etc/puppetlabs/puppet/ssl/certs/ca.pem on the master`
-
-## Note 2
+## Note
 
 The hostname in `puppetdb_url` should match the master certname, otherwize you will get TLS errors. If you use a master with a non-resolvable certname, you can add an entry to your hosts file:
 ```bash
