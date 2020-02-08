@@ -5,7 +5,7 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
 Gem::Specification.new do |spec|
   spec.name          = "puppetwash"
-  spec.version       = "0.1.0"
+  spec.version       = "0.2.0"
   spec.authors       = ["Puppet"]
   spec.email         = ["puppet@puppet.com"]
 
@@ -13,8 +13,7 @@ Gem::Specification.new do |spec|
   spec.description   = "A Wash plugin for examining Puppet infrastructure nodes such as PuppetDB, Puppet Server, and PE Classifier"
   spec.homepage      = "https://github.com/puppetlabs/puppetwash"
   spec.license       = "Apache-2.0"
-  spec.files         = Dir["*.rb"] + ["puppet"]
-  spec.require_paths = ["."]
+  spec.files         = Dir["*.rb"]
 
   spec.required_ruby_version = "~> 2.3"
 
